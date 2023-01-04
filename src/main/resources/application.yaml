@@ -1,6 +1,21 @@
 spring:
   data:
     mongodb:
+      uri: mongodb://localhost:27017/top-100-crypto
       host: localhost
       port: 27017
       database: top-100-crypto
+
+
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        web:
+          socket: DEBUG
+      apache:
+        tomcat:
+          websocket: DEBUG
+
