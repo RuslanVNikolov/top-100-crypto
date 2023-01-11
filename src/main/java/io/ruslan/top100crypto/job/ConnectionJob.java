@@ -1,30 +1,30 @@
 package io.ruslan.top100crypto.job;
 
-import io.ruslan.top100crypto.client.OrderDataClient;
-import jakarta.websocket.ContainerProvider;
-import jakarta.websocket.DeploymentException;
-import jakarta.websocket.Session;
-import jakarta.websocket.WebSocketContainer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.ruslan.top100crypto.client.CmcClient;
+import io.ruslan.top100crypto.converter.CurrencyMapper;
+import io.ruslan.top100crypto.model.document.Currency;
+import io.ruslan.top100crypto.model.dto.response.LatestResponseDto;
+import io.ruslan.top100crypto.service.CurrencyService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.net.URI;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@RequiredArgsConstructor
 public class ConnectionJob {
 
-  public static final String KRAKEN_WEB_SOCKET_URL = "wss://ws.kraken.com";
-  public static final int DELAY_BETWEEN_READS = 2000;
+  private final CmcClient client;
+  private final CurrencyService currencyService;
+  private final CurrencyMapper currencyMapper;
 
   @Scheduled(timeUnit = TimeUnit.SECONDS, fixedDelay = 20)
-  public void printKrakenMarketData()
-      throws DeploymentException, IOException, InterruptedException {
-    WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-    Session session = container.connectToServer(OrderDataClient.class,
-        URI.create(KRAKEN_WEB_SOCKET_URL));
-    Thread.sleep(DELAY_BETWEEN_READS);
-    session.close();
+  public void getLatest() throws JsonProcessingException {
+    LatestResponseDto latest = client.getLatest();
+    List<Currency> currencies = currencyMapper.dtoToDocuments(latest);
+    currencyService.upsertAll(currencies);
   }
 }

@@ -6,7 +6,9 @@ spring:
       port: 27017
       database: top-100-crypto
 
-
+cmc:
+  api:
+    key: 745b7d68-e21b-4776-8adb-6e7359739b44
 
 logging:
   level:

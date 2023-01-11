@@ -20,6 +20,7 @@ public class Currency {
 
     @Id
     private String id;
+    private Long cmcId;
 
     private String name;
     private String shortName;
