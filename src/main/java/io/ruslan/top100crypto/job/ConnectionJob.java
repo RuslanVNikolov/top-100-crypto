@@ -23,8 +23,8 @@ public class ConnectionJob {
 
   @Scheduled(timeUnit = TimeUnit.SECONDS, fixedDelay = 20)
   public void getLatest() throws JsonProcessingException {
-    LatestResponseDto latest = client.getLatest();
-    List<Currency> currencies = currencyMapper.dtoToDocuments(latest);
-    currencyService.upsertAll(currencies);
+//    LatestResponseDto latest = client.getLatest();
+//    List<Currency> currencies = currencyMapper.dtoToDocuments(latest);
+//    currencyService.upsertAll(currencies);
   }
 }
