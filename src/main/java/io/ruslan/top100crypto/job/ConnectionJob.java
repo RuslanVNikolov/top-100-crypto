@@ -7,6 +7,7 @@ import io.ruslan.top100crypto.model.document.Currency;
 import io.ruslan.top100crypto.model.dto.response.LatestResponseDto;
 import io.ruslan.top100crypto.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class ConnectionJob {
 
@@ -21,10 +23,11 @@ public class ConnectionJob {
   private final CurrencyService currencyService;
   private final CurrencyMapper currencyMapper;
 
-  @Scheduled(timeUnit = TimeUnit.SECONDS, fixedDelay = 20)
+  @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 5)
   public void getLatest() throws JsonProcessingException {
-//    LatestResponseDto latest = client.getLatest();
-//    List<Currency> currencies = currencyMapper.dtoToDocuments(latest);
-//    currencyService.upsertAll(currencies);
+    log.info("Getting the latest and greatest data");
+    LatestResponseDto latest = client.getLatest();
+    List<Currency> currencies = currencyMapper.dtoToDocuments(latest);
+    currencyService.upsertAll(currencies);
   }
 }

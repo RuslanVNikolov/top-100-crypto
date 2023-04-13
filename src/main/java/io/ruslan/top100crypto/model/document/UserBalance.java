@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import static java.math.BigDecimal.ZERO;
@@ -36,26 +37,24 @@ public class UserBalance {
     }
 
     public BigDecimal getPortion() {
-        return portfolio.getTotalValue().divide(getUsdValue());
+        return portfolio.getTotalValue().divide(getUsdValue(), RoundingMode.HALF_UP);
     }
 
     public BigDecimal getAverageBuyPrice() {
-        BigDecimal averageBuyPrice = ZERO;
-
-        for (Transaction transaction : transactions.stream().filter(t -> t.getAmount().compareTo(ZERO) > 0).toList()) {
-            averageBuyPrice = averageBuyPrice.add(transaction.getPriceUsd().multiply(transaction.getAmount()));
-        }
-
-        return averageBuyPrice.divide(amount);
+        return transactions.stream()
+                .filter(t -> t.getAmount().compareTo(BigDecimal.ZERO) > 0)
+                .map(t -> t.getPriceUsd().multiply(t.getAmount()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(getAmount(), RoundingMode.HALF_UP);
     }
 
     public BigDecimal getProfit() {
-        BigDecimal totalSpent = ZERO;
+        return getUsdValue().subtract(getTotalSpent());
+    }
 
-        for (Transaction transaction : transactions) {
-            totalSpent = totalSpent.add(transaction.getPriceUsd().multiply(transaction.getAmount()));
-        }
-
-        return getUsdValue().subtract(totalSpent);
+    private BigDecimal getTotalSpent() {
+        return transactions.stream()
+                .map(t -> t.getPriceUsd().multiply(t.getAmount()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

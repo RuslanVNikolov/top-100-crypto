@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.List;
 
 import static java.math.BigDecimal.ZERO;
@@ -28,22 +29,12 @@ public class Portfolio {
     private List<UserBalance> userBalances;
 
     public BigDecimal getTotalValue() {
-        BigDecimal totalValue = ZERO;
-
-        for (UserBalance userBalance : userBalances) {
-            totalValue = totalValue.add(userBalance.getAmount().multiply(userBalance.getCurrency().getValueUsd()));
-        }
-
-        return totalValue.round(new MathContext(2));
+        return userBalances.stream().map(ub -> ub.getAmount().multiply(ub.getCurrency().getValueUsd()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
     }
 
     public BigDecimal getTotalProfit() {
-        BigDecimal totalProfit = ZERO;
-
-        for (UserBalance userBalance : userBalances) {
-            totalProfit = totalProfit.add(userBalance.getProfit());
-        }
-
-        return totalProfit.round(new MathContext(2));
+        return userBalances.stream().map(UserBalance::getProfit).reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 }

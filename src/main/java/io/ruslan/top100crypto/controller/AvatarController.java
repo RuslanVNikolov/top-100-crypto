@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Base64;
 
 @RequiredArgsConstructor
-@Controller
+@RestController
 @RequestMapping("/avatars")
 public class AvatarController {
 
