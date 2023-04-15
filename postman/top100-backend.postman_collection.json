@@ -1,0 +1,115 @@
+{
+	"info": {
+		"_postman_id": "a1cea8fb-18e2-469a-8f3a-ee4cf862111f",
+		"name": "top100-backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9404328"
+	},
+	"item": [
+		{
+			"name": "TEST",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/portfolios/test",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"portfolios",
+						"test"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{bearer_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.sendRequest({",
+					"    url: pm.collectionVariables.get(\"your_auth_url\"),",
+					"    method: 'POST',",
+					"    header: {",
+					"        'Content-Type': 'application/json',",
+					"        'Accept': 'application/json'",
+					"    },",
+					"    body: {",
+					"        mode: 'raw',",
+					"        raw: JSON.stringify({",
+					"            username: pm.collectionVariables.get(\"your_username\"),",
+					"            password: pm.collectionVariables.get(\"your_password\")",
+					"        })",
+					"    }",
+					"}, (err, res) => {",
+					"    if (err) {",
+					"        console.error(err);",
+					"        return;",
+					"    }",
+					"    ",
+					"    if (res.code !== 200) {",
+					"        console.error('Authentication failed. Status code:', res.code);",
+					"        return;",
+					"    }",
+					"    ",
+					"    const jsonResponse = res.json();",
+					"    const token = jsonResponse.access_token || jsonResponse.token;",
+					"    if (token) {",
+					"        console.log(\"DA TOKEN\", token)",
+					"        pm.collectionVariables.set('bearer_token', token);",
+					"    } else {",
+					"        console.error('Token not found in response', jsonResponse);",
+					"    }",
+					"});",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "your_username",
+			"value": "admin",
+			"type": "string"
+		},
+		{
+			"key": "your_password",
+			"value": "admin",
+			"type": "string"
+		},
+		{
+			"key": "your_auth_url",
+			"value": "localhost:8080/auth/login",
+			"type": "string"
+		},
+		{
+			"key": "bearer_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

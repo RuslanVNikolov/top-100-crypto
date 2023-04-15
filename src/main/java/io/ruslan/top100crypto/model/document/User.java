@@ -2,14 +2,13 @@ package io.ruslan.top100crypto.model.document;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -24,8 +23,6 @@ public class User implements UserDetails {
     private String password;
     @Setter(AccessLevel.NONE)
     private String role;
-    @DBRef
-    private List<Portfolio> portfolios;
 
     @Override // TODO: implement this better
     public Collection<? extends GrantedAuthority> getAuthorities() {

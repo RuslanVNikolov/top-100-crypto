@@ -12,8 +12,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-import static java.math.BigDecimal.ZERO;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,21 +21,18 @@ public class UserBalance {
     @Id
     private String id;
     @DBRef
-    private User user;
-    @DBRef
     private Currency currency;
     @DBRef
-    private Portfolio portfolio;
-    @DBRef
     private List<Transaction> transactions;
-    private BigDecimal amount;
 
-    public BigDecimal getUsdValue() {
-        return amount.multiply(currency.getValueUsd());
+    public BigDecimal getAmount() {
+        return transactions.stream()
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal getPortion() {
-        return portfolio.getTotalValue().divide(getUsdValue(), RoundingMode.HALF_UP);
+    public BigDecimal getUsdValue() {
+        return getAmount().multiply(currency.getValueUsd());
     }
 
     public BigDecimal getAverageBuyPrice() {

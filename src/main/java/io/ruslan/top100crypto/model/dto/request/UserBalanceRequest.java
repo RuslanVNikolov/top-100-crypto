@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -16,5 +15,4 @@ public class UserBalanceRequest {
 
     private CurrencyRequest currency;
     private List<TransactionRequest> transactions;
-    private BigDecimal amount;
 }
