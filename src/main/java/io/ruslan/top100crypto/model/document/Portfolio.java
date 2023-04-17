@@ -9,11 +9,8 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.List;
-
-import static java.math.BigDecimal.ZERO;
 
 @Data
 @AllArgsConstructor
@@ -29,7 +26,7 @@ public class Portfolio {
     private List<UserBalance> userBalances;
 
     public BigDecimal getTotalValue() {
-        return userBalances.stream().map(ub -> ub.getAmount().multiply(ub.getCurrency().getValueUsd()))
+        return userBalances.stream().map(ub -> ub.getTotalAmount().multiply(ub.getCurrency().getValueUsd()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
     }
 

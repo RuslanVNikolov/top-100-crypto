@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -26,9 +27,10 @@ public class PortfolioService {
     private final UserBalanceRepository userBalanceRepository;
 
     @SneakyThrows
-    public Portfolio getPortfolioById(String id) {
-        return portfolioRepository.findByIdAndUserId(id, "figure out how to get it from session data")
-                .orElseThrow(() -> new Exception(String.format("Portfolio %s not found", id)));
+    public Portfolio getUserPortfolio() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        return portfolioRepository.findAllByUserId(user.getId()).stream().min(Comparator.comparing(Portfolio::getTotalValue)).orElse(null);
     }
 
     @SneakyThrows
@@ -67,6 +69,7 @@ public class PortfolioService {
         return Transaction.builder()
                 .id(t.getId())
                 .amount(t.getAmount())
+                .priceUsd(t.getPriceUsd())
                 .date(t.getDate())
                 .build();
     }

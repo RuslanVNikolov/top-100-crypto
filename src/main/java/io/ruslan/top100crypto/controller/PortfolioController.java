@@ -22,9 +22,9 @@ public class PortfolioController {
 
     private final PortfolioService portfolioService;
 
-    @GetMapping("/{id}")
-    public Portfolio getPortfolioById(@PathVariable String id) {
-        return portfolioService.getPortfolioById(id);
+    @GetMapping
+    public Portfolio getPortfolioByUserId() {
+        return portfolioService.getUserPortfolio();
     }
 
     @GetMapping("/test")

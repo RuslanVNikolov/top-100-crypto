@@ -25,23 +25,31 @@ public class UserBalance {
     @DBRef
     private List<Transaction> transactions;
 
-    public BigDecimal getAmount() {
+    public BigDecimal getTotalAmount() {
         return transactions.stream()
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal getUsdValue() {
-        return getAmount().multiply(currency.getValueUsd());
+        return getTotalAmount().multiply(currency.getValueUsd());
     }
 
     public BigDecimal getAverageBuyPrice() {
-        return transactions.stream()
-                .filter(t -> t.getAmount().compareTo(BigDecimal.ZERO) > 0)
+        List<Transaction> buyTransactions = transactions.stream()
+                .filter(t -> t.getAmount().compareTo(BigDecimal.ZERO) > 0).toList();
+
+        BigDecimal totalAmountBought = buyTransactions.stream()
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalCostBought = buyTransactions.stream()
                 .map(t -> t.getPriceUsd().multiply(t.getAmount()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .divide(getAmount(), RoundingMode.HALF_UP);
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return totalCostBought.divide(totalAmountBought, RoundingMode.HALF_UP);
     }
+
 
     public BigDecimal getProfit() {
         return getUsdValue().subtract(getTotalSpent());
