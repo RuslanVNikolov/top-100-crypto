@@ -19,15 +19,15 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class ConnectionJob {
 
-  private final CmcClient client;
-  private final CurrencyService currencyService;
-  private final CurrencyMapper currencyMapper;
+    private final CmcClient client;
+    private final CurrencyService currencyService;
+    private final CurrencyMapper currencyMapper;
 
-  @Scheduled(timeUnit = TimeUnit.MINUTES, fixedDelay = 5)
-  public void getLatest() throws JsonProcessingException {
-    log.info("Getting the latest and greatest data");
-    LatestResponseDto latest = client.getLatest();
-    List<Currency> currencies = currencyMapper.dtoToDocuments(latest);
-    currencyService.upsertAll(currencies);
-  }
+    @Scheduled(timeUnit = TimeUnit.SECONDS, fixedDelay = 10)
+    public void getLatest() throws JsonProcessingException {
+        log.info("Getting the latest and greatest data");
+        LatestResponseDto latest = client.getLatest();
+        List<Currency> currencies = currencyMapper.dtoToDocuments(latest);
+        currencyService.upsertAll(currencies);
+    }
 }
