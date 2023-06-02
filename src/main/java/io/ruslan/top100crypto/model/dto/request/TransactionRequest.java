@@ -13,9 +13,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransactionRequest {
-    private String id;
-    private CurrencyRequest currency;
+    private String symbol;
     private BigDecimal amount;
-    private BigDecimal priceUsd;
+    private BigDecimal price;
     private LocalDateTime date;
 }

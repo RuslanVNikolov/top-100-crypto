@@ -20,6 +20,7 @@ import java.util.List;
 public class Portfolio {
     @Id
     private String id;
+    @DBRef
     private User user;
     private String name;
     @DBRef

@@ -1,6 +1,5 @@
 package io.ruslan.top100crypto.model.dto.request;
 
-import io.ruslan.top100crypto.model.document.UserBalance;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 public class PortfolioRequest {
     private String id;
-    private String username;
     private String name;
     private List<UserBalanceRequest> userBalances;
 }
