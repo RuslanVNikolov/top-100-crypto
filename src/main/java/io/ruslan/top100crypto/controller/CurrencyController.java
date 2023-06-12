@@ -3,6 +3,7 @@ package io.ruslan.top100crypto.controller;
 import io.ruslan.top100crypto.model.document.Currency;
 import io.ruslan.top100crypto.model.document.CurrencyHistory;
 import io.ruslan.top100crypto.service.CurrencyService;
+import io.ruslan.top100crypto.service.UserCurrencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -25,17 +26,20 @@ import java.util.Optional;
 public class CurrencyController {
 
     private final CurrencyService currencyService;
+    private final UserCurrencyService userCurrencyService;
 
     @GetMapping("/top100")
     public ResponseEntity<List<Currency>> getTop100Currencies() {
         List<Currency> response = currencyService.getTop100Currencies();
-        log.info("top 100 response: " + response.toString());
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
     @GetMapping("/history")
     public ResponseEntity<List<CurrencyHistory>> getHistoryByCmcId(@RequestParam("cmcId") Long cmcId,
-                                                                   @RequestParam(value = "from", required = false) Optional<String> fromStr, @RequestParam(value = "to", required = false) Optional<String> toStr) {
+                                                                   @RequestParam(value = "from", required = false)
+                                                                   Optional<String> fromStr,
+                                                                   @RequestParam(value = "to", required = false)
+                                                                   Optional<String> toStr) {
         Instant from =
                 fromStr.map(Instant::parse).orElse(ZonedDateTime.now(ZoneId.systemDefault()).minusYears(5).toInstant());
         Instant to = toStr.map(Instant::parse).orElse(Instant.now());
