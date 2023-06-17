@@ -35,4 +35,17 @@ public class Portfolio {
         return userBalances.stream().map(UserBalance::getProfit).reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
     }
+
+    public BigDecimal getProfitPercentage() {
+        BigDecimal totalValue = getTotalValue();
+        if (totalValue.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal weightedProfitPercentageSum = userBalances.stream()
+                .map(ub -> ub.getProfitPercentage().multiply(ub.getTotalValue()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return weightedProfitPercentageSum.divide(totalValue, RoundingMode.HALF_UP);
+    }
 }

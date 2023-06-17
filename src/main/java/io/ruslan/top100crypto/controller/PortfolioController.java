@@ -3,6 +3,7 @@ package io.ruslan.top100crypto.controller;
 import io.ruslan.top100crypto.model.document.Portfolio;
 import io.ruslan.top100crypto.model.dto.request.PortfolioRequest;
 import io.ruslan.top100crypto.model.dto.request.TransactionRequest;
+import io.ruslan.top100crypto.model.dto.response.PortfolioResponseDto;
 import io.ruslan.top100crypto.service.PortfolioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ public class PortfolioController {
     private final PortfolioService portfolioService;
 
     @GetMapping
-    public Portfolio getPortfolioByUserId() {
+    public PortfolioResponseDto getPortfolioByUserId() {
         return portfolioService.getUserPortfolio();
     }
 

@@ -4,6 +4,7 @@ import io.ruslan.top100crypto.model.document.*;
 import io.ruslan.top100crypto.model.dto.request.PortfolioRequest;
 import io.ruslan.top100crypto.model.dto.request.TransactionRequest;
 import io.ruslan.top100crypto.model.dto.request.UserBalanceRequest;
+import io.ruslan.top100crypto.model.dto.response.PortfolioResponseDto;
 import io.ruslan.top100crypto.repository.CurrencyRepository;
 import io.ruslan.top100crypto.repository.PortfolioRepository;
 import io.ruslan.top100crypto.repository.TransactionRepository;
@@ -30,15 +31,23 @@ public class PortfolioService {
     private final TransactionRepository transactionRepository;
     private final UserBalanceRepository userBalanceRepository;
 
-    public Portfolio getUserPortfolio() {
+    public PortfolioResponseDto getUserPortfolio() {
         return getUserPortfolio(null);
     }
 
     @SneakyThrows
-    private Portfolio getUserPortfolio(Portfolio orElse) {
+    private PortfolioResponseDto getUserPortfolio(PortfolioResponseDto orElse) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
-        return portfolioRepository.findAllByUserId(user.getId()).stream().min(Comparator.comparing(Portfolio::getTotalValue)).orElse(orElse);
+        Optional<Portfolio> portfolioOpt =
+                portfolioRepository.findAllByUserId(user.getId()).stream().min(Comparator.comparing(Portfolio::getTotalValue));
+        if (portfolioOpt.isEmpty()) {
+            return null;
+        }
+
+        PortfolioResponseDto wtf = new PortfolioResponseDto(portfolioOpt.get());
+        log.info(wtf.toString());
+        return wtf;
     }
 
     @SneakyThrows
@@ -61,8 +70,8 @@ public class PortfolioService {
                 currencyRepository.findByShortName(request.getSymbol()).orElse(Currency.builder().name(request.getSymbol()).shortName(request.getSymbol()).build());
         currencyRepository.save(currency);
 
-        Portfolio portfolio = portfolioRepository.findAllByUserId(user.getId()).stream().findFirst()
-                .orElse(Portfolio.builder().user(user).userBalances(new ArrayList<>()).build());
+        Portfolio portfolio =
+                portfolioRepository.findAllByUserId(user.getId()).stream().findFirst().orElse(Portfolio.builder().user(user).userBalances(new ArrayList<>()).build());
         Optional<UserBalance> userBalanceOpt =
                 portfolio.getUserBalances().stream().filter(ub -> ub.getCurrency().getShortName().equals(currency.getShortName())).findFirst();
         Transaction transaction =
@@ -77,7 +86,7 @@ public class PortfolioService {
 
         userBalance.getTransactions().add(transaction);
         userBalanceRepository.save(userBalance);
-        
+
         return portfolioRepository.save(portfolio);
     }
 

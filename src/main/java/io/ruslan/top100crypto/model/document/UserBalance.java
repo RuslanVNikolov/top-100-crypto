@@ -31,7 +31,7 @@ public class UserBalance {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal getUsdValue() {
+    public BigDecimal getTotalValue() {
         return getTotalAmount().multiply(currency.getValueUsd());
     }
 
@@ -52,12 +52,28 @@ public class UserBalance {
 
 
     public BigDecimal getProfit() {
-        return getUsdValue().subtract(getTotalSpent());
+        return getTotalValue().subtract(getTotalSpent());
     }
 
-    private BigDecimal getTotalSpent() {
+    public BigDecimal getProfitPercentage() {
+        BigDecimal totalSpent = getTotalSpent();
+        BigDecimal profit = getProfit();
+
+        // To avoid divide by zero error
+        if (totalSpent.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+
+        return profit.divide(totalSpent, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+    }
+
+    public BigDecimal getTotalSpent() {
         return transactions.stream()
                 .map(t -> t.getPriceUsd().multiply(t.getAmount()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal getPercentageFromPortfolio(Portfolio portfolio) {
+        return getTotalValue().divide(portfolio.getTotalValue(), RoundingMode.HALF_DOWN);
     }
 }
