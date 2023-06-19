@@ -21,6 +21,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static java.math.BigDecimal.ZERO;
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -31,12 +33,8 @@ public class PortfolioService {
     private final TransactionRepository transactionRepository;
     private final UserBalanceRepository userBalanceRepository;
 
-    public PortfolioResponseDto getUserPortfolio() {
-        return getUserPortfolio(null);
-    }
-
     @SneakyThrows
-    private PortfolioResponseDto getUserPortfolio(PortfolioResponseDto orElse) {
+    public PortfolioResponseDto getUserPortfolio() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         Optional<Portfolio> portfolioOpt =
@@ -45,9 +43,7 @@ public class PortfolioService {
             return null;
         }
 
-        PortfolioResponseDto wtf = new PortfolioResponseDto(portfolioOpt.get());
-        log.info(wtf.toString());
-        return wtf;
+        return new PortfolioResponseDto(portfolioOpt.get());
     }
 
     @SneakyThrows
@@ -67,7 +63,7 @@ public class PortfolioService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         Currency currency =
-                currencyRepository.findByShortName(request.getSymbol()).orElse(Currency.builder().name(request.getSymbol()).shortName(request.getSymbol()).build());
+                currencyRepository.findByShortName(request.getSymbol()).orElse(Currency.builder().name(request.getSymbol()).shortName(request.getSymbol()).valueUsd(ZERO).marketCap(ZERO).build());
         currencyRepository.save(currency);
 
         Portfolio portfolio =

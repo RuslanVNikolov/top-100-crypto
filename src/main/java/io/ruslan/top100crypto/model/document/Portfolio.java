@@ -27,13 +27,12 @@ public class Portfolio {
     private List<UserBalance> userBalances;
 
     public BigDecimal getTotalValue() {
-        return userBalances.stream().map(ub -> ub.getTotalAmount().multiply(ub.getCurrency().getValueUsd()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
+        return userBalances.stream().map(UserBalance::getTotalValue).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
     }
 
     public BigDecimal getTotalProfit() {
-        return userBalances.stream().map(UserBalance::getProfit).reduce(BigDecimal.ZERO, BigDecimal::add)
-                .setScale(2, RoundingMode.HALF_UP);
+        return userBalances.stream().map(UserBalance::getProfit).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2,
+                RoundingMode.HALF_UP);
     }
 
     public BigDecimal getProfitPercentage() {
@@ -42,10 +41,9 @@ public class Portfolio {
             return BigDecimal.ZERO;
         }
 
-        BigDecimal weightedProfitPercentageSum = userBalances.stream()
-                .map(ub -> ub.getProfitPercentage().multiply(ub.getTotalValue()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal weightedProfitPercentageSum =
+                userBalances.stream().map(ub -> ub.getProfitPercentage().multiply(ub.getTotalValue())).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return weightedProfitPercentageSum.divide(totalValue, RoundingMode.HALF_UP);
+        return weightedProfitPercentageSum.divide(totalValue, 2, RoundingMode.HALF_UP);
     }
 }

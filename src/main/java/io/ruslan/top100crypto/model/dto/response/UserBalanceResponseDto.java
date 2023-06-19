@@ -19,7 +19,10 @@ import java.util.stream.Collectors;
 public class UserBalanceResponseDto {
     private CurrencyResponseDto currency;
     private List<TransactionResponseDto> transactions = new ArrayList<>();
+
+    private BigDecimal amount;
     private BigDecimal percentage;
+    private BigDecimal totalValue;
     private BigDecimal profit;
     private BigDecimal profitPercentage;
     private BigDecimal averageBuyPrice;
@@ -29,7 +32,9 @@ public class UserBalanceResponseDto {
         this.transactions = userBalance.getTransactions().stream()
                 .map(TransactionResponseDto::new)
                 .collect(Collectors.toList());
+        this.amount = userBalance.getTotalAmount();
         this.percentage = userBalance.getPercentageFromPortfolio(portfolio);
+        this.totalValue = userBalance.getTotalValue();
         this.profit = userBalance.getProfit();
         this.profitPercentage = userBalance.getProfitPercentage();
         this.averageBuyPrice = userBalance.getAverageBuyPrice();

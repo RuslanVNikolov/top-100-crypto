@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
+import static java.math.BigDecimal.ZERO;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,31 +30,41 @@ public class UserBalance {
     public BigDecimal getTotalAmount() {
         return transactions.stream()
                 .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(ZERO, BigDecimal::add);
     }
 
     public BigDecimal getTotalValue() {
-        return getTotalAmount().multiply(currency.getValueUsd());
+        BigDecimal value = currency.getValueUsd();
+
+
+        if (value.compareTo(ZERO) < 1) {
+            return getTotalAmount().multiply(getAverageBuyPrice());
+        }
+        return getTotalAmount().multiply(value);
     }
 
     public BigDecimal getAverageBuyPrice() {
         List<Transaction> buyTransactions = transactions.stream()
-                .filter(t -> t.getAmount().compareTo(BigDecimal.ZERO) > 0).toList();
+                .filter(t -> t.getAmount().compareTo(ZERO) > 0).toList();
 
         BigDecimal totalAmountBought = buyTransactions.stream()
                 .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(ZERO, BigDecimal::add);
 
         BigDecimal totalCostBought = buyTransactions.stream()
                 .map(t -> t.getPriceUsd().multiply(t.getAmount()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(ZERO, BigDecimal::add);
 
-        return totalCostBought.divide(totalAmountBought, RoundingMode.HALF_UP);
+        return totalCostBought.divide(totalAmountBought, 2, RoundingMode.HALF_UP);
     }
 
 
     public BigDecimal getProfit() {
-        return getTotalValue().subtract(getTotalSpent());
+        BigDecimal totalValue = getTotalValue();
+        if (totalValue.compareTo(ZERO) < 1) {
+            return ZERO;
+        }
+        return totalValue.subtract(getTotalSpent());
     }
 
     public BigDecimal getProfitPercentage() {
@@ -60,20 +72,22 @@ public class UserBalance {
         BigDecimal profit = getProfit();
 
         // To avoid divide by zero error
-        if (totalSpent.compareTo(BigDecimal.ZERO) == 0) {
-            return BigDecimal.ZERO;
+        if (totalSpent.compareTo(ZERO) == 0) {
+            return ZERO;
         }
 
-        return profit.divide(totalSpent, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+        return profit.divide(totalSpent, 2, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
     }
 
     public BigDecimal getTotalSpent() {
         return transactions.stream()
                 .map(t -> t.getPriceUsd().multiply(t.getAmount()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(ZERO, BigDecimal::add);
     }
 
     public BigDecimal getPercentageFromPortfolio(Portfolio portfolio) {
-        return getTotalValue().divide(portfolio.getTotalValue(), RoundingMode.HALF_DOWN);
+        return getTotalValue().divide(portfolio.getTotalValue(), 2, RoundingMode.HALF_UP).multiply(new BigDecimal(
+                "100"
+        ));
     }
 }
