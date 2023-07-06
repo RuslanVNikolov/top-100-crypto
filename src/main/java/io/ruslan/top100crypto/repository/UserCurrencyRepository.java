@@ -12,5 +12,4 @@ public interface UserCurrencyRepository extends MongoRepository<UserCurrency, St
     Optional<UserCurrency> findByUserIdAndCurrencyId(String userId, String currencyId);
 
     List<UserCurrency> findAllByUserId(String userId);
-
 }

@@ -24,7 +24,7 @@ public class User implements UserDetails {
     @Setter(AccessLevel.NONE)
     private String role;
 
-    @Override // TODO: implement this better
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(new SimpleGrantedAuthority(role));
     }

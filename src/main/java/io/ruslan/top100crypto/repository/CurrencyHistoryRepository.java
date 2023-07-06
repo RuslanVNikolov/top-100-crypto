@@ -8,6 +8,4 @@ import java.util.List;
 
 public interface CurrencyHistoryRepository extends MongoRepository<CurrencyHistory, String> {
     List<CurrencyHistory> findByCmcIdAndTimestampBetween(Long cmcId, Instant startDate, Instant endDate);
-
-//    List<CurrencyHistory> findByCmcId(Long cmcId);
 }
